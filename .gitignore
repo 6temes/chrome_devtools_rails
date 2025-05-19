@@ -6,9 +6,16 @@
 /pkg/
 /spec/reports/
 /spec/examples.txt
+/test/dummy/db/*.sqlite3
+/test/dummy/db/*.sqlite3-*
+/test/dummy/log/*.log
+/test/dummy/storage/
+/test/dummy/tmp/
 /test/tmp/
 /test/version_tmp/
 /tmp/
+
+.claude
 
 # Used by dotenv library to load environment variables.
 # .env
@@ -54,3 +61,4 @@ build-iPhoneSimulator/
 
 # Used by RuboCop. Remote config files pulled in from inherit_from directive.
 # .rubocop-https?--*
+
