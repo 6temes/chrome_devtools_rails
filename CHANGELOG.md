@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2023-05-19
 
 ### Added
+
 - Initial release
 - Automatic workspace mapping for Chrome DevTools
 - Serves JSON file at `/.well-known/appspecific/com.chrome.devtools.json`
