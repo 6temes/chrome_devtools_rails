@@ -1,9 +1,9 @@
 require "test_helper"
 
-module ChromeDevtoolsJson
+module ChromeDevtoolsRails
   class UuidPersistenceTest < ActiveSupport::TestCase
     setup do
-      @controller = ChromeDevtoolsJson::DevtoolsController.new
+      @controller = ChromeDevtoolsRails::DevtoolsController.new
       @uuid_path = Rails.root.join("tmp", "chrome_devtools_uuid")
       File.delete(@uuid_path) if File.exist?(@uuid_path)
     end

@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.summary     = "Serve com.chrome.devtools.json for Chrome automatic workspace setup"
   spec.description = "A Rails engine that automatically provides the /.well-known/appspecific/com.chrome.devtools.json endpoint for enabling Chrome DevTools automatic workspace mapping in development mode."
 
-  spec.homepage    = "https://github.com/6temes/chrome_devtools_json"
+  spec.homepage    = "https://github.com/6temes/chrome_devtools_rails"
   spec.license     = "MIT"
 
   spec.metadata["homepage_uri"]      = spec.homepage

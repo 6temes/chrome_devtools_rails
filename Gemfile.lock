@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    chrome_devtools_json (0.1.0)
+    chrome_devtools_rails (0.1.0)
       rails (~> 8.0, >= 8.0.2)
 
 GEM
@@ -239,7 +239,7 @@ PLATFORMS
   arm64-darwin
 
 DEPENDENCIES
-  chrome_devtools_json!
+  chrome_devtools_rails!
   propshaft
   puma
   rubocop-rails-omakase

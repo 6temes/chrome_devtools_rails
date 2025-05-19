@@ -1,6 +1,6 @@
 require "test_helper"
 
-module ChromeDevtoolsJson
+module ChromeDevtoolsRails
   class DevtoolsControllerTest < ActionDispatch::IntegrationTest
     include Engine.routes.url_helpers
 

@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in chrome_devtools_json.gemspec.
+# Specify your gem's dependencies in chrome_devtools_rails.gemspec.
 gemspec
 
 gem "puma"

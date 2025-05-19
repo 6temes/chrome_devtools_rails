@@ -49,7 +49,7 @@ No route configuration is needed — the engine mounts itself automatically in d
 
 ## 🤝 Contributing
 
-Pull requests are welcome on GitHub at [https://github.com/6temes/chrome_devtools_json](https://github.com/6temes/chrome_devtools_json).
+Pull requests are welcome on GitHub at [https://github.com/6temes/chrome_devtools_rails](https://github.com/6temes/chrome_devtools_rails).
 
 Ideas for improvement:
 
