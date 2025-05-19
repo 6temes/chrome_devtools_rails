@@ -2,7 +2,7 @@
 
 This gem provides a minimal Rails engine that automatically serves the Chrome DevTools workspace mapping file at:
 
-```
+```text
 /.well-known/appspecific/com.chrome.devtools.json
 ```
 
@@ -26,7 +26,8 @@ This engine is **automatically mounted** and only active in **development mode**
 Add this line to your application's `Gemfile`:
 
 ```ruby
-gem "chrome_devtools_json", github: "6temes/chrome_devtools_json"
+gem "chrome_devtools_json"
+
 ```
 
 Then run:
