@@ -51,12 +51,6 @@ No route configuration is needed — the engine mounts itself automatically in d
 
 Pull requests are welcome on GitHub at [https://github.com/6temes/chrome_devtools_rails](https://github.com/6temes/chrome_devtools_rails).
 
-Ideas for improvement:
-
-- Add support for regenerating the UUID
-- Configurable root path
-- Rake task or generator to inspect the current workspace config
-
 ---
 
 ## 📄 License
