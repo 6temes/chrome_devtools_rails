@@ -11,6 +11,9 @@ gem "propshaft"
 
 # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
 gem "rubocop-rails-omakase", require: false
+# parallel 2.x (a rubocop dependency) requires Ruby >= 3.3; cap it so the lint
+# toolchain still installs on our supported Ruby 3.2.
+gem "parallel", "< 2"
 
 # Testing dependencies
 gem "mocha", require: false
