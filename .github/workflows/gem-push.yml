@@ -19,13 +19,19 @@ jobs:
         uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1
         with:
           ruby-version: "4.0"
-          bundler-cache: true
 
       - name: Extract version from tag
         id: version
         run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
-      - name: Push to RubyGems
-        uses: rubygems/release-gem@6317d8d1f7e28c24d28f6eff169ea854948bd9f7 # v1.2.0
+      # gem build reads the version from the gemspec (CHROME_DEVTOOLS_RAILS_VERSION),
+      # bypassing bundler so the dev-pinned Gemfile.lock doesn't trip frozen mode.
+      - name: Configure RubyGems credentials
+        uses: rubygems/configure-rubygems-credentials@bc6dd217f8a4f919d6835fcfefd470ef821f5c44 # v1.0.0
+
+      - name: Build and push gem
         env:
           CHROME_DEVTOOLS_RAILS_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gem build chrome_devtools_rails.gemspec
+          gem push "chrome_devtools_rails-${CHROME_DEVTOOLS_RAILS_VERSION}.gem"
