@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    chrome_devtools_rails (0.2.0)
+    chrome_devtools_rails (0.0.0.dev)
       rails (~> 8.0, >= 8.0.2)
 
 GEM
@@ -120,7 +120,6 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
-    minitest-mock (5.27.0)
     mocha (3.1.0)
       ruby2_keywords (>= 0.0.5)
     net-imap (0.6.4.1)
@@ -152,8 +151,6 @@ GEM
     psych (5.4.0)
       date
       stringio
-    puma (8.0.2)
-      nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.2.6)
     rack-session (2.1.2)
@@ -258,11 +255,9 @@ PLATFORMS
 
 DEPENDENCIES
   chrome_devtools_rails!
-  minitest-mock
   mocha
   parallel (< 2)
   propshaft
-  puma
   rubocop-rails-omakase
   sqlite3
 

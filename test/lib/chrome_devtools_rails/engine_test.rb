@@ -24,11 +24,10 @@ module ChromeDevtoolsRails
 
         test_app.define_singleton_method(:routes) { routes }
 
-        Rails.stub :env, ActiveSupport::StringInquirer.new(env) do
-          ChromeDevtoolsRails::Engine.initializers
-            .find { _1.name == "chrome_devtools_rails.append_route" }
-            .run(test_app)
-        end
+        Rails.stubs(:env).returns(ActiveSupport::StringInquirer.new(env))
+        ChromeDevtoolsRails::Engine.initializers
+          .find { _1.name == "chrome_devtools_rails.append_route" }
+          .run(test_app)
 
         route_added
       end

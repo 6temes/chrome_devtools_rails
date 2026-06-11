@@ -1,3 +1,3 @@
 module ChromeDevtoolsRails
-  VERSION = "0.2.0"
+  VERSION = ENV.fetch("CHROME_DEVTOOLS_RAILS_VERSION", "0.0.0.dev")
 end
