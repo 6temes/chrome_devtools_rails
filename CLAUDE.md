@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A Rails engine gem (`chrome_devtools_rails`) that serves the Chrome DevTools workspace mapping file at `/.well-known/appspecific/com.chrome.devtools.json`. When Chrome fetches this from a local dev server, it enables automatic workspace folder mapping, letting you edit and save source files from DevTools directly to disk.
 
-Note: the gem and GitHub repo are named `chrome_devtools_rails`, but this working directory is `chrome_devtools_json`.
+## Lifecycle — superseded by Rails 8.2
+
+Rails 8.2 serves this endpoint natively via a built-in `Rails::DevToolsController` ([rails/rails#56245](https://github.com/rails/rails/pull/56245)), so this gem's purpose is bounded — it's the working solution only for Rails 8.0/8.1. On Rails 8.2+ the gem still serves the route (no breakage on upgrade) but emits a deprecation at boot. The version gate lives in `lib/chrome_devtools_rails.rb` as `RAILS_NATIVE_SUPPORT_VERSION` (`8.2`) + `warn_if_superseded`; the engine calls it in development only. Bump `RAILS_NATIVE_SUPPORT_VERSION` only if Rails changes which version first ships native support.
 
 ## Public gem — change with care
 
@@ -34,7 +36,7 @@ rake build                                          # build the .gem into pkg/
 rake release                                        # tag and push to RubyGems
 ```
 
-CI (`.github/workflows/ci.yml`) runs `bin/rubocop -f github` and `bin/rails test` on Ruby 3.4.2. The test job installs `google-chrome-stable` to support potential system tests. Both lint and test must pass.
+CI (`.github/workflows/ci.yml`) runs `bin/rubocop -f github` (lint, on Ruby 4.0) and `bin/rails test` across a Ruby matrix (3.2, 3.3, 3.4, 4.0). Both lint and the full matrix must pass.
 
 ## Architecture
 
@@ -42,7 +44,8 @@ The entire engine is three source files plus a controller:
 
 - `lib/chrome_devtools_rails/engine.rb` — the core mechanism. Instead of being `mount`ed by the host app, the engine uses an **initializer that appends a route directly to the host application's routes** (`app.routes.append`). This is why installation requires no route configuration. The route is added **only when `Rails.env.development?` or `Rails.env.test?`** — never in production. Any change to environment gating lives here.
 - `app/controllers/chrome_devtools_rails/devtools_controller.rb` — renders `{ workspace: { root:, uuid: } }`. `root` is `Rails.root`; `uuid` is generated once via `SecureRandom.uuid` and **persisted to `tmp/chrome_devtools_uuid`**, then reused on every subsequent request so Chrome sees a stable workspace identity.
-- `lib/chrome_devtools_rails/version.rb` / `lib/chrome_devtools_rails.rb` — version constant and require entrypoint.
+- `lib/chrome_devtools_rails.rb` — require entrypoint, plus the Rails 8.2 deprecation gate (`RAILS_NATIVE_SUPPORT_VERSION`, `superseded_by_rails?`, `warn_if_superseded`, and the gem's `deprecator`).
+- `lib/chrome_devtools_rails/version.rb` — version constant.
 
 ### Testing setup
 
@@ -50,6 +53,7 @@ Tests run against a full dummy Rails app in `test/dummy/` (Rails 8, SQLite, Prop
 
 Three test layers, each verifying a distinct concern:
 - `test/lib/.../engine_test.rb` — confirms the route-appending initializer runs in development/test but **not** production (stubs `Rails.env` per environment).
+- `test/lib/.../deprecation_test.rb` — stubs `Rails.gem_version` to assert the deprecation fires on 8.2+ and stays quiet below it.
 - `test/controllers/.../devtools_controller_test.rb` — integration test of the JSON response and UUID persistence across requests.
 - `test/unit/uuid_persistence_test.rb` — unit-tests the controller's private `uuid`/`persist_uuid` methods.
 
@@ -57,4 +61,4 @@ Tests that touch the UUID delete `tmp/chrome_devtools_uuid` in `setup` to start 
 
 ## Requirements
 
-Ruby ≥ 3.1, Rails ~> 8.0 (>= 8.0.2).
+Ruby ≥ 3.2, Rails ~> 8.0 (>= 8.0.2).

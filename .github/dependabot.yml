@@ -1,33 +1,41 @@
 version: 2
 updates:
-  - package-ecosystem: 'bundler'
-    directory: '/'
+  - package-ecosystem: "bundler"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '06:00'
-      timezone: 'Asia/Tokyo'
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Asia/Tokyo"
     assignees:
-      - '6temes'
+      - "6temes"
     labels:
-      - 'dependencies'
-      - 'ruby'
+      - "dependencies"
+      - "ruby"
+    open-pull-requests-limit: 10
+    versioning-strategy: lockfile-only
     groups:
       minor-and-patch:
         patterns:
-          - '*'
+          - "*"
         update-types:
-          - 'minor'
-          - 'patch'
-    versioning-strategy: lockfile-only
+          - "minor"
+          - "patch"
 
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '06:00'
-      timezone: 'Asia/Tokyo'
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Asia/Tokyo"
+    assignees:
+      - "6temes"
     labels:
-      - 'dependencies'
-      - 'github-actions'
+      - "dependencies"
+      - "github-actions"
+    open-pull-requests-limit: 10
+    groups:
+      github-actions:
+        patterns:
+          - "*"

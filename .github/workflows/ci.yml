@@ -15,36 +15,29 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4.2
+          ruby-version: "4.0"
           bundler-cache: true
 
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
   test:
-    runs-on: ubuntu-latest   
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: [ "3.2", "3.3", "3.4", "4.0" ]
     steps:
-      - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config google-chrome-stable
-
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up Ruby
+      - name: Set up Ruby ${{ matrix.ruby-version }}
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4.2
+          ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
 
       - name: Run tests
         env:
           RAILS_ENV: test
         run: bin/rails test
-
-      - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v7
-        if: failure()
-        with:
-          name: screenshots
-          path: ${{ github.workspace }}/tmp/screenshots
-          if-no-files-found: ignore

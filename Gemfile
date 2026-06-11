@@ -14,6 +14,8 @@ gem "rubocop-rails-omakase", require: false
 
 # Testing dependencies
 gem "mocha", require: false
+# minitest 6 extracted Object#stub / Minitest::Mock into its own gem.
+gem "minitest-mock", require: false
 
 # Start debugger with binding.b [https://github.com/ruby/debug]
 # gem "debug", ">= 1.0.0"

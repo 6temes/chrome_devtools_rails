@@ -10,6 +10,8 @@ module ChromeDevtoolsRails
               as: :chrome_devtools_json
         end
       end
+
+      ChromeDevtoolsRails.warn_if_superseded if Rails.env.development?
     end
   end
 end
