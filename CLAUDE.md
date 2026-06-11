@@ -10,7 +10,7 @@ Note: the gem and GitHub repo are named `chrome_devtools_rails`, but this workin
 
 ## Public gem — change with care
 
-This is a **public repository** and a **published gem with at least one downstream gem depending on it**. Treat the following as a stable contract; changing any of it is a breaking change that requires a SemVer major/minor bump and a `CHANGELOG.md` entry:
+This repository is **public** and produces the published gem **`chrome_devtools_rails`** (RubyGems: https://rubygems.org/gems/chrome_devtools_rails). Real Rails apps depend on it via their `Gemfile`, so treat the following as a stable contract; changing any of it is a breaking change that requires a SemVer major/minor bump and a `CHANGELOG.md` entry:
 
 - The gem name (`chrome_devtools_rails`) and the `ChromeDevtoolsRails::Engine` / `ChromeDevtoolsRails::DevtoolsController` constants.
 - The named route `:chrome_devtools_json` and its URL helpers (dependents and host apps may reference them).
