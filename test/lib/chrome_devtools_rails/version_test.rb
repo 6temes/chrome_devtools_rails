@@ -6,8 +6,8 @@ module ChromeDevtoolsRails
       assert_not_nil ChromeDevtoolsRails::VERSION
     end
 
-    test "version follows semantic versioning format" do
-      assert_match(/\A\d+\.\d+\.\d+\z/, ChromeDevtoolsRails::VERSION)
+    test "version is a valid gem version" do
+      assert Gem::Version.correct?(ChromeDevtoolsRails::VERSION)
     end
   end
 end

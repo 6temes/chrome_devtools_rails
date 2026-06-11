@@ -1,28 +1,27 @@
 require_relative "lib/chrome_devtools_rails/version"
 
 Gem::Specification.new do |spec|
-  spec.name        = "chrome_devtools_rails"
-  spec.version     = ChromeDevtoolsRails::VERSION
-  spec.authors     = [ "Daniel Lopez 👾" ]
-  spec.email       = [ "daniel@6temes.cat" ]
-
-  spec.summary     = "Serve com.chrome.devtools.json for Chrome automatic workspace setup"
+  spec.name = "chrome_devtools_rails"
+  spec.version = ChromeDevtoolsRails::VERSION
+  spec.authors = [ "Daniel López Prat" ]
+  spec.email = [ "daniel@6temes.cat" ]
+  spec.homepage = "https://github.com/6temes/chrome_devtools_rails"
+  spec.summary = "Serve com.chrome.devtools.json for Chrome automatic workspace setup"
   spec.description = "A Rails engine that automatically provides the /.well-known/appspecific/com.chrome.devtools.json endpoint for enabling Chrome DevTools automatic workspace mapping in development mode."
+  spec.license = "MIT"
 
-  spec.homepage    = "https://github.com/6temes/chrome_devtools_rails"
-  spec.license     = "MIT"
+  spec.metadata = {
+    "bug_tracker_uri" => "https://github.com/6temes/chrome_devtools_rails/issues",
+    "changelog_uri" => "https://github.com/6temes/chrome_devtools_rails/releases",
+    "rubygems_mfa_required" => "true",
+    "source_code_uri" => "https://github.com/6temes/chrome_devtools_rails"
+  }
 
-  spec.metadata["homepage_uri"]      = spec.homepage
-  spec.metadata["source_code_uri"]   = "#{spec.homepage}/tree/main"
-  spec.metadata["documentation_uri"] = "#{spec.homepage}/blob/main/README.md"
-  spec.metadata["changelog_uri"]     = "#{spec.homepage}/blob/main/CHANGELOG.md"
-  spec.metadata["allowed_push_host"] = "https://rubygems.org"
+  spec.required_ruby_version = ">= 3.2"
 
-  spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md", "CHANGELOG.md"]
+  spec.files = Dir.chdir(__dir__) do
+    Dir["{app,config,db,lib}/**/*", "LICENSE", "Rakefile", "README.md"]
   end
-
-  spec.required_ruby_version = ">= 3.1"
 
   spec.add_dependency "rails", "~> 8.0", ">= 8.0.2"
 end

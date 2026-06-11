@@ -12,6 +12,14 @@ This engine is **automatically mounted** and only active in **development mode**
 
 ---
 
+## ⚠️ Rails 8.2+ ships this natively
+
+As of **Rails 8.2**, Rails serves this endpoint itself through a built-in `Rails::DevToolsController` ([rails/rails#56245](https://github.com/rails/rails/pull/56245)). On Rails 8.2 or newer, uncomment the generated devtools route in `config/routes.rb` and you no longer need this gem.
+
+This gem is still useful on **Rails 8.0 and 8.1**, which have no native support. When it detects Rails 8.2+, it keeps serving the endpoint but emits a deprecation warning so you know you can switch to the native controller and drop the dependency.
+
+---
+
 ## 🚀 Usage
 
 1. Visit your Rails app on `localhost`.
@@ -41,7 +49,7 @@ No route configuration is needed — the engine mounts itself automatically in d
 
 ## ✅ Requirements
 
-- Ruby ≥ 3.1
+- Ruby ≥ 3.2
 - Rails ≥ 8.0.2
 - Google Chrome v89+ (with DevTools workspace support)
 
