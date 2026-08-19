@@ -69,3 +69,16 @@ Tests that touch the UUID delete `tmp/chrome_devtools_uuid` in `setup` to start 
 ## Requirements
 
 Ruby ≥ 3.2, Rails ~> 8.0 (>= 8.0.2).
+
+## CI standard
+
+The workflows in `.github/workflows/` and `.github/dependabot.yml` follow a fleet-wide
+standard rather than this repo's own taste: `docs/ci-standard.md` in the
+`6temes/claude-plugins` repo. It records each invariant next to the failure that
+motivated it — the shared chassis (`on: push`, guarded `concurrency`, least-privilege
+`permissions`, per-job `timeout-minutes`, pinned service images), the matrix
+vocabulary, and the single Dependabot shape.
+
+Read it before changing either file. Several invariants look arbitrary until you know
+what broke without them, and `bin/ci-conformance` in that repo will flag a working tree
+that drifts.
