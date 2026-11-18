@@ -1,8 +1,4 @@
 #!/usr/bin/env ruby
-# Usage: bin/stamp-version VERSION FILE
-#
-# Rewrites the quoted literal on FILE's `VERSION =` line. Run by the release
-# workflow before `gem build`, so the shipped gem carries the tag's version.
 
 version, path = ARGV
 abort "usage: bin/stamp-version VERSION FILE" unless version && path

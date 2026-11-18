@@ -31,7 +31,6 @@ jobs:
         with:
           persist-credentials: false
 
-      # No bundle: nothing from the Gemfile runs in the job that can publish.
       - name: Set up Ruby
         uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
         with:

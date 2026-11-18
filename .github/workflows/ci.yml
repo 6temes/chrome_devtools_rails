@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches: ['**']
-  # release.yml calls this workflow so a tag publishes only after this exact CI passes on it.
   workflow_call:
 
 concurrency:
