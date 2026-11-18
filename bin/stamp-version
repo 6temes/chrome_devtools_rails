@@ -1,27 +1,31 @@
 #!/usr/bin/env ruby
+# Stamps a release version into version.rb before the gem is built:
+#
+#   bin/stamp-version VERSION FILE
+#
+# Stdlib only: the publish job installs no gems.
 
+abort "usage: bin/stamp-version VERSION FILE" unless ARGV.size == 2
 version, path = ARGV
-abort "usage: bin/stamp-version VERSION FILE" unless version && path
 
-# `1.2.3-rc1` would build as `1.2.3.pre.rc1` and miss the tag-named gem file.
+# `1.2.3-rc1` builds as `1.2.3.pre.rc1`, and the publish job pushes the gem file
+# named for the tag, which would then not exist.
 unless Gem::Version.correct?(version) && Gem::Version.new(version).to_s == version
-  abort "#{version.inspect} is not a release version"
+  abort "stamp-version: #{version.inspect} is not a canonical gem version"
 end
 
 pattern = /^(\s*VERSION = )"[^"]*"$/
 source = File.read(path)
 count = source.scan(pattern).size
-abort "#{path}: expected one quoted VERSION literal, found #{count}" unless count == 1
+abort "stamp-version: expected one VERSION literal in #{path}, found #{count}" unless count == 1
 
 File.write path, source.sub(pattern) { "#{$1}\"#{version}\"" }
 
-# The text match cannot see a later reassignment, a block comment or a suffix
-# on the literal, so the stamped file is loaded the way a host app would load it.
-loaded = IO.popen({ "RUBYOPT" => nil, "BUNDLE_GEMFILE" => nil },
-  [ RbConfig.ruby, "--disable-gems", "-e", "load ARGV[0]; print ChromeDevtoolsRails::VERSION", path ],
-  err: File::NULL, &:read)
-
-unless $?.success? && loaded == version
+# The pattern cannot see a block comment, a suffix or a later reassignment, so
+# Ruby loads the stamped file as `gem build` would and compares the constant
+# itself. Only the exit status is read: the file could print anything.
+check = "load ARGV[0]; exit(ChromeDevtoolsRails::VERSION == ARGV[1])"
+unless system({ "RUBYOPT" => nil, "BUNDLE_GEMFILE" => nil }, RbConfig.ruby, "-e", check, path, version, out: File::NULL, err: File::NULL)
   File.write path, source
-  abort "#{path}: loads as #{loaded.inspect} after stamping, not #{version.inspect}"
+  abort "stamp-version: #{path} does not load as #{version.inspect}; restored it"
 end
