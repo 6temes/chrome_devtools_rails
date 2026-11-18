@@ -257,7 +257,6 @@ PLATFORMS
 DEPENDENCIES
   chrome_devtools_rails!
   mocha
-  parallel (< 2)
   propshaft
   rubocop-rails-omakase
   sqlite3

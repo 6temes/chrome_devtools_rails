@@ -34,7 +34,7 @@ bundle exec rubocop -a                                  # lint with safe autocor
 bundle exec rake build                                  # build the .gem into pkg/
 ```
 
-CI runs three workflows, with all GitHub Action refs SHA-pinned: `ci.yml` (`bundle exec rubocop` on Ruby 4.0 + `bundle exec rake test` across a Ruby 3.2–4.0 matrix), `release-drafter.yml`, and `release.yml`. CodeQL runs as GitHub's default setup, so there is no `codeql.yml`. The dev/lint toolchain pins `parallel < 2` because rubocop's `parallel 2.x` requires Ruby ≥ 3.3 while we still support 3.2.
+CI runs three workflows, with all GitHub Action refs SHA-pinned: `ci.yml` (`bundle exec rubocop` and `bundle exec rake test`, both on the Ruby in `.ruby-version`), `release-drafter.yml`, and `release.yml`. CodeQL runs as GitHub's default setup, so there is no `codeql.yml`.
 
 ## Releasing
 
@@ -77,7 +77,7 @@ Tests that touch the UUID delete `tmp/chrome_devtools_uuid` in `setup` to start 
 
 ## Requirements
 
-Ruby ≥ 3.2, Rails ~> 8.0 (>= 8.0.2).
+Ruby ≥ 4.0, Rails ~> 8.0 (>= 8.0.2).
 
 ## CI standard
 
