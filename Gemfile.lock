@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    chrome_devtools_rails (0.0.0.dev)
+    chrome_devtools_rails (0.0.1.dev)
       rails (~> 8.0, >= 8.0.2)
 
 GEM

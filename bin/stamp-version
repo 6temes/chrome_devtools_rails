@@ -10,7 +10,20 @@ end
 
 pattern = /^(\s*VERSION = )"[^"]*"$/
 source = File.read(path)
-count = source.scan(pattern).size
-abort "#{path}: expected one quoted VERSION literal, found #{count}" unless count == 1
+# Counted across comments too, so a commented-out assignment is never the one stamped.
+count = source.scan(/\bVERSION\s*=/).size
+abort "#{path}: expected one VERSION assignment, found #{count}" unless count == 1
+abort "#{path}: the VERSION assignment is not a bare quoted literal" unless source.match?(pattern)
 
 File.write path, source.sub(pattern) { "#{$1}\"#{version}\"" }
+
+# The text match cannot see a later reassignment, a block comment or a suffix
+# on the literal, so the stamped file is loaded the way a host app would load it.
+loaded = IO.popen({ "RUBYOPT" => nil, "BUNDLE_GEMFILE" => nil },
+  [ RbConfig.ruby, "--disable-gems", "-e", "load ARGV[0]; print ChromeDevtoolsRails::VERSION", path ],
+  err: File::NULL, &:read)
+
+unless $?.success? && loaded == version
+  File.write path, source
+  abort "#{path}: loads as #{loaded.inspect} after stamping, not #{version.inspect}"
+end

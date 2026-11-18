@@ -17,6 +17,10 @@ module ChromeDevtoolsRails
       FileUtils.remove_entry @dir
     end
 
+    test "the unreleased placeholder satisfies the >= 0 requirement Bundler gives a git source" do
+      assert_operator Gem::Version.new(VERSION), :>=, Gem::Version.new("0")
+    end
+
     test "stamps the version into the real version file" do
       _, status = stamp("1.2.3")
 
@@ -43,6 +47,18 @@ module ChromeDevtoolsRails
       assert_not status.success?
       assert_match "VERSION", stderr
       assert_equal "module ChromeDevtoolsRails\nend\n", File.read(@target)
+    end
+
+    test "rejects a file whose placeholder is followed by a second VERSION assignment" do
+      [ "# VERSION = \"9.9.9\"", "VERSION = \"9.9.9\"" ].each do |second|
+        File.write @target, "module ChromeDevtoolsRails\n  VERSION = \"0.0.1.dev\"\n  #{second}\nend\n"
+        original = File.binread(@target)
+
+        _, status = stamp("1.2.3")
+
+        assert_not status.success?, "expected a file with #{second.inspect} to be rejected"
+        assert_equal original, File.binread(@target)
+      end
     end
 
     private

@@ -38,7 +38,11 @@ CI runs three workflows, with all GitHub Action refs SHA-pinned: `ci.yml` (`bund
 
 ## Releasing
 
-Publishing the release draft is the whole release: `release-drafter` keeps the draft current from merged PR titles (default bump is patch; label PRs to bump minor/major), and publishing it pushes the `vX.Y.Z` tag that `release.yml` builds and publishes from. No version-bump commit, no `rake release`, no API key.
+Publishing the release draft is the whole release: `release-drafter` keeps the draft current from merged PR titles, and publishing it pushes the `vX.Y.Z` tag that `release.yml` builds and publishes from. No version-bump commit, no `rake release`, no API key.
+
+- **Version bump:** a merged PR labelled `major`, `minor` or `patch` bumps that part; an unlabelled one bumps patch.
+- **Prereleases:** Release Drafter skips them. Drafts are never prereleases, and a published prerelease is ignored when it picks the previous release.
+- **Failed publish:** release tags are never moved or deleted. Leave the failed release published, so the next draft resolves to a new version, then fix the cause on `main` and regenerate the next draft's notes before publishing it: they start after the failed release, so add back the changes it never shipped.
 
 The one setting to keep in step: the gem's trusted publisher on rubygems.org must name workflow `release.yml` and environment `release`. The release shape itself is described in the Gem release section of `docs/ci-standard.md` in `6temes/claude-plugins`.
 
@@ -49,7 +53,7 @@ The entire engine is three source files plus a controller:
 - `lib/chrome_devtools_rails/engine.rb` — the core mechanism. Instead of being `mount`ed by the host app, the engine uses an **initializer that appends a route directly to the host application's routes** (`app.routes.append`). This is why installation requires no route configuration. The route is added **only when `Rails.env.development?` or `Rails.env.test?`** — never in production. Any change to environment gating lives here.
 - `app/controllers/chrome_devtools_rails/devtools_controller.rb` — renders `{ workspace: { root:, uuid: } }`. `root` is `Rails.root`; `uuid` is generated once via `SecureRandom.uuid` and **persisted to `tmp/chrome_devtools_uuid`**, then reused on every subsequent request so Chrome sees a stable workspace identity.
 - `lib/chrome_devtools_rails.rb` — require entrypoint, plus the Rails 8.2 deprecation gate (`RAILS_NATIVE_SUPPORT_VERSION`, `superseded_by_rails?`, `warn_if_superseded`, and the gem's `deprecator`).
-- `lib/chrome_devtools_rails/version.rb` — `VERSION`, the literal `0.0.0.dev` in the repo (and in `Gemfile.lock`). At release `bin/stamp-version` rewrites it to the tag's version before `gem build`, so the shipped gem carries the real version; `bin/` is not packaged.
+- `lib/chrome_devtools_rails/version.rb` — `VERSION`, the literal `0.0.1.dev` in the repo (and in `Gemfile.lock`). At release `bin/stamp-version` rewrites it to the tag's version before `gem build`, so the shipped gem carries the real version; `bin/` is not packaged.
 
 ### Testing setup
 

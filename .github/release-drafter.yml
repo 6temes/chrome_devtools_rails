@@ -10,4 +10,10 @@ group-changes:
     title-template: "Bump $GROUP from $FIRST_FROM to $LAST_TO$GROUP_IN"
 no-changes-template: "No changes."
 version-resolver:
+  major:
+    labels: [major]
+  minor:
+    labels: [minor]
+  patch:
+    labels: [patch]
   default: patch
