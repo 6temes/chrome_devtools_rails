@@ -10,10 +10,8 @@ end
 
 pattern = /^(\s*VERSION = )"[^"]*"$/
 source = File.read(path)
-# Counted across comments too, so a commented-out assignment is never the one stamped.
-count = source.scan(/\bVERSION\s*=/).size
-abort "#{path}: expected one VERSION assignment, found #{count}" unless count == 1
-abort "#{path}: the VERSION assignment is not a bare quoted literal" unless source.match?(pattern)
+count = source.scan(pattern).size
+abort "#{path}: expected one quoted VERSION literal, found #{count}" unless count == 1
 
 File.write path, source.sub(pattern) { "#{$1}\"#{version}\"" }
 

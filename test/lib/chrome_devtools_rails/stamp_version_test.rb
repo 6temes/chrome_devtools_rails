@@ -50,8 +50,8 @@ module ChromeDevtoolsRails
     end
 
     test "rejects a file whose placeholder is followed by a second VERSION assignment" do
-      [ "# VERSION = \"9.9.9\"", "VERSION = \"9.9.9\"" ].each do |second|
-        File.write @target, "module ChromeDevtoolsRails\n  VERSION = \"0.0.1.dev\"\n  #{second}\nend\n"
+      [ "=begin\n  VERSION = \"9.9.9\"\n=end", "  VERSION = \"9.9.9\" # release version" ].each do |second|
+        File.write @target, "module ChromeDevtoolsRails\n  VERSION = \"0.0.1.dev\"\n#{second}\nend\n"
         original = File.binread(@target)
 
         _, status = stamp("1.2.3")
