@@ -49,7 +49,7 @@ No route configuration is needed — the engine mounts itself automatically in d
 
 ## ✅ Requirements
 
-- Ruby ≥ 3.2
+- Ruby ≥ 4.0
 - Rails ≥ 8.0.2
 - Google Chrome v89+ (with DevTools workspace support)
 

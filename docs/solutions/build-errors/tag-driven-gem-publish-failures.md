@@ -33,13 +33,13 @@ A tag-driven RubyGems publish pipeline (release-drafter → push a `vX.Y.Z` tag 
 - **First attempt — no trusted publisher yet.** OIDC auth failed outright; trusted publishing had not been configured on RubyGems for the gem. Configuring it was necessary but not sufficient (see next).
 - **Setting the RubyGems "Environment" field to `release`.** The RubyGems guide *suggests* `release`, but the workflow declared no `environment:`. The OIDC token therefore carried no environment claim, so it didn't match the configured publisher — same `No trusted publisher configured` error. Fix: leave Environment **blank** so it matches the workflow.
 - **`@dependabot`-style re-run of the failed workflow.** After fixing auth, the build step failed on the frozen lockfile. Re-running the same run didn't help — a tag-triggered run uses the workflow **as it existed at the tagged commit**, so the fix has to land on `main` and the tag be re-cut.
-- **`rubygems/release-gem` + `bundler-cache: true`.** The action runs `bundle exec rake build`; `bundler-cache: true` puts bundler in frozen/deployment mode. The ENV-injected release version (`0.2.0`) differs from the committed `Gemfile.lock`, which pins the path gem at its dev default (`0.0.0.dev`) → `Bundler::ProductionError`.
+- **`rubygems/release-gem` + `bundler-cache: true`.** The action runs `bundle exec rake build`; `bundler-cache: true` puts bundler in frozen/deployment mode. The ENV-injected release version (`0.2.0`) differs from the committed `Gemfile.lock`, which pins the path gem at its dev default (`0.0.1.dev`) → `Bundler::ProductionError`.
 
 ## Solution
 
 Two independent fixes — one on RubyGems, one in the workflow.
 
-**1. Trusted publisher must mirror the workflow's OIDC claims.** On `rubygems.org/gems/<gem>/trusted_publishers`, set repository owner/name and **Workflow filename = `gem-push.yml`** (just the filename), and leave **Environment blank** unless the workflow declares `environment:`.
+**1. Trusted publisher must mirror the workflow's OIDC claims.** On `rubygems.org/gems/<gem>/trusted_publishers`, set repository owner/name, **Workflow filename** to the publishing workflow's file name alone, and **Environment** to the exact name its publish job declares in `environment:`. This gem now publishes from `release.yml` in the `release` environment, so the entry reads `release.yml` / `release`.
 
 **2. Build/push without bundler**, so the dev-pinned lockfile can't trip frozen mode. Drop `bundler-cache: true` and replace `rubygems/release-gem` with explicit `gem build`/`gem push`:
 
@@ -70,14 +70,15 @@ Because the tag already pointed at the pre-fix commit, the release/tag had to be
 ## Why This Works
 
 - **OIDC matching is exact.** Trusted publishing matches the token's claims (repo, workflow filename, ref, and environment) against the configured publisher. An Environment value with no corresponding `environment:` in the workflow means the token has no environment claim to match — blank-to-blank matches, `release`-to-nothing does not.
-- **`gem build` bypasses bundler.** The pattern `VERSION = ENV.fetch("MY_GEM_VERSION", "0.0.0.dev")` means the committed `Gemfile.lock` records the path gem at `0.0.0.dev`, while at release the gemspec evaluates to the real tag version. `bundle` in frozen/deployment mode refuses to reconcile that lockfile↔gemspec mismatch. `gem build` reads the gemspec alone and never consults the lockfile, so frozen mode is irrelevant.
+- **`gem build` bypasses bundler.** The pattern `VERSION = ENV.fetch("MY_GEM_VERSION", "0.0.1.dev")` means the committed `Gemfile.lock` records the path gem at `0.0.1.dev`, while at release the gemspec evaluates to the real tag version. `bundle` in frozen/deployment mode refuses to reconcile that lockfile↔gemspec mismatch. `gem build` reads the gemspec alone and never consults the lockfile, so frozen mode is irrelevant.
 
 ## Prevention
 
 - For tag-driven publishing with an **ENV-injected version + committed `Gemfile.lock`**, build with `gem build`/`gem push` — not `bundle exec rake build` or `rubygems/release-gem`, which run frozen in CI.
 - When configuring trusted publishing, **read the workflow first**: the Environment field must be blank if there's no `environment:`, or the exact name if there is. A mismatch fails closed with "No trusted publisher configured."
-- Remember tag-triggered workflows run the workflow **at the tagged commit** — fix on `main`, then re-cut the tag; don't just re-run.
-- The publish path isn't covered by PR CI (gem-push is tags-only), so validate it on the **first real release** and treat that release as the test.
+- Remember tag-triggered workflows run the workflow **at the tagged commit**: a fix to the workflow itself must land on `main` and ship under the next tag. A release tag is never moved or deleted.
+- **Recovering from a failed publish:** leave the failed GitHub Release published. Deleting it makes Release Drafter resolve the same version again, and publishing a release for a tag that already exists pushes no tag, so `release.yml` never runs. Land the fix on `main`, which refreshes the draft at the next version, then regenerate that draft's notes before publishing it: the draft lists only changes after the failed release, so the ones that never reached RubyGems must be added back.
+- The publish job runs only on a tag, so PR CI never exercises it: validate it on the **first real release** and treat that release as the test.
 
 ## Related Issues
 

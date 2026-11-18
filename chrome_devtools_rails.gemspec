@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/6temes/chrome_devtools_rails"
   }
 
-  spec.required_ruby_version = ">= 3.2"
+  spec.required_ruby_version = ">= 4.0"
 
   spec.files = Dir.chdir(__dir__) do
     Dir["{app,config,db,lib}/**/*", "LICENSE", "Rakefile", "README.md"]
