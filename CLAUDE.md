@@ -34,16 +34,13 @@ bundle exec rubocop -a                                  # lint with safe autocor
 bundle exec rake build                                  # build the .gem into pkg/
 ```
 
-CI runs four workflows, with all GitHub Action refs SHA-pinned: `ci.yml` (`bundle exec rubocop` on Ruby 4.0 + `bundle exec rake test` across a Ruby 3.2–4.0 matrix), `codeql.yml` (weekly + PR security scanning), `release-drafter.yml`, and `gem-push.yml`. The dev/lint toolchain pins `parallel < 2` because rubocop's `parallel 2.x` requires Ruby ≥ 3.3 while we still support 3.2.
+CI runs three workflows, with all GitHub Action refs SHA-pinned: `ci.yml` (`bundle exec rubocop` on Ruby 4.0 + `bundle exec rake test` across a Ruby 3.2–4.0 matrix), `release-drafter.yml`, and `release.yml`. CodeQL runs as GitHub's default setup, so there is no `codeql.yml`. The dev/lint toolchain pins `parallel < 2` because rubocop's `parallel 2.x` requires Ruby ≥ 3.3 while we still support 3.2.
 
 ## Releasing
 
-Tag-driven — no manual `rake release`, no API key:
+Publishing the release draft is the whole release: `release-drafter` keeps the draft current from merged PR titles (default bump is patch; label PRs to bump minor/major), and publishing it pushes the `vX.Y.Z` tag that `release.yml` builds and publishes from. No version-bump commit, no `rake release`, no API key.
 
-- `release-drafter` keeps a draft GitHub Release updated from merged PR titles on every push to `main` (default bump is patch; label PRs to bump minor/major).
-- Pushing a `vX.Y.Z` tag triggers `gem-push.yml`, which builds with `CHROME_DEVTOOLS_RAILS_VERSION` set from the tag (`lib/chrome_devtools_rails/version.rb` reads it; default `0.0.0.dev`) and publishes to RubyGems via **OIDC trusted publishing**.
-
-Requires the GitHub repo to be registered as a trusted publisher for the gem on rubygems.org.
+The one setting to keep in step: the gem's trusted publisher on rubygems.org must name workflow `release.yml` and environment `release`. The release shape itself is described in the Gem release section of `docs/ci-standard.md` in `6temes/claude-plugins`.
 
 ## Architecture
 
@@ -52,15 +49,16 @@ The entire engine is three source files plus a controller:
 - `lib/chrome_devtools_rails/engine.rb` — the core mechanism. Instead of being `mount`ed by the host app, the engine uses an **initializer that appends a route directly to the host application's routes** (`app.routes.append`). This is why installation requires no route configuration. The route is added **only when `Rails.env.development?` or `Rails.env.test?`** — never in production. Any change to environment gating lives here.
 - `app/controllers/chrome_devtools_rails/devtools_controller.rb` — renders `{ workspace: { root:, uuid: } }`. `root` is `Rails.root`; `uuid` is generated once via `SecureRandom.uuid` and **persisted to `tmp/chrome_devtools_uuid`**, then reused on every subsequent request so Chrome sees a stable workspace identity.
 - `lib/chrome_devtools_rails.rb` — require entrypoint, plus the Rails 8.2 deprecation gate (`RAILS_NATIVE_SUPPORT_VERSION`, `superseded_by_rails?`, `warn_if_superseded`, and the gem's `deprecator`).
-- `lib/chrome_devtools_rails/version.rb` — `VERSION`, read from the `CHROME_DEVTOOLS_RAILS_VERSION` env at build time (default `0.0.0.dev`); the release tag supplies the real version.
+- `lib/chrome_devtools_rails/version.rb` — `VERSION`, the literal `0.0.0.dev` in the repo (and in `Gemfile.lock`). At release `bin/stamp-version` rewrites it to the tag's version before `gem build`, so the shipped gem carries the real version; `bin/` is not packaged.
 
 ### Testing setup
 
 Run with `bundle exec rake test` (a `Rake::TestTask` over `test/**/*_test.rb`). Tests run against a full dummy Rails app in `test/dummy/` (Rails 8, SQLite, Propshaft); `test/test_helper.rb` boots `test/dummy/config/environment`. Stack: **Minitest** with **Mocha** for stubbing (`stubs`/`returns` — minitest 6 removed `Object#stub`).
 
-Three test layers, each verifying a distinct concern:
+Test layers, each verifying a distinct concern:
 - `test/lib/.../engine_test.rb` — confirms the route-appending initializer runs in development/test but **not** production (stubs `Rails.env` per environment, via Mocha).
 - `test/lib/.../deprecation_test.rb` — stubs `Rails.gem_version` to assert the deprecation fires on 8.2+ and stays quiet below it.
+- `test/lib/.../stamp_version_test.rb` — runs `bin/stamp-version` against a temporary copy of the real `version.rb` and reads the result back in a subprocess, so the suite's own `VERSION` is never redefined.
 - `test/controllers/.../devtools_controller_test.rb` — integration test of the JSON response and UUID persistence across requests.
 - `test/unit/uuid_persistence_test.rb` — unit-tests the controller's private `uuid`/`persist_uuid` methods.
 

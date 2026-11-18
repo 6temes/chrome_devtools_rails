@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+# Usage: bin/stamp-version VERSION FILE
+#
+# Rewrites the quoted literal on FILE's `VERSION =` line. Run by the release
+# workflow before `gem build`, so the shipped gem carries the tag's version.
+
+version, path = ARGV
+abort "usage: bin/stamp-version VERSION FILE" unless version && path
+
+# `1.2.3-rc1` would build as `1.2.3.pre.rc1` and miss the tag-named gem file.
+unless Gem::Version.correct?(version) && Gem::Version.new(version).to_s == version
+  abort "#{version.inspect} is not a release version"
+end
+
+pattern = /^(\s*VERSION = )"[^"]*"$/
+source = File.read(path)
+count = source.scan(pattern).size
+abort "#{path}: expected one quoted VERSION literal, found #{count}" unless count == 1
+
+File.write path, source.sub(pattern) { "#{$1}\"#{version}\"" }

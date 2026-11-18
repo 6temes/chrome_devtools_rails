@@ -1,0 +1,53 @@
+name: Release
+
+# Publishes through RubyGems trusted publishing, which matches on this file's
+# name and the `release` environment: renaming either breaks publishing until
+# the trusted publisher on rubygems.org is updated to match.
+on:
+  push:
+    tags: ['v*']
+
+# No concurrency group: a publish must never be cancelled mid-flight, and one
+# equal to ci.yml's would make the called CI cancel this run.
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # No bundle: nothing from the Gemfile runs in the job that can publish.
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: .ruby-version
+          bundler: none
+
+      - name: Stamp the tag version into version.rb
+        run: bin/stamp-version "${GITHUB_REF_NAME#v}" lib/chrome_devtools_rails/version.rb
+
+      - name: Build gem
+        run: gem build chrome_devtools_rails.gemspec
+
+      - name: Configure RubyGems credentials
+        uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a # v2.1.0
+
+      # Pushing the tag-named file means a build whose version disagrees with
+      # the tag publishes nothing.
+      - name: Push gem
+        run: gem push "chrome_devtools_rails-${GITHUB_REF_NAME#v}.gem"

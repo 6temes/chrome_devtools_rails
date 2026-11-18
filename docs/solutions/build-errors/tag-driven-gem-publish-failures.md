@@ -39,7 +39,7 @@ A tag-driven RubyGems publish pipeline (release-drafter → push a `vX.Y.Z` tag 
 
 Two independent fixes — one on RubyGems, one in the workflow.
 
-**1. Trusted publisher must mirror the workflow's OIDC claims.** On `rubygems.org/gems/<gem>/trusted_publishers`, set repository owner/name and **Workflow filename = `gem-push.yml`** (just the filename), and leave **Environment blank** unless the workflow declares `environment:`.
+**1. Trusted publisher must mirror the workflow's OIDC claims.** On `rubygems.org/gems/<gem>/trusted_publishers`, set repository owner/name, **Workflow filename** to the publishing workflow's file name alone, and **Environment** to the exact name its publish job declares in `environment:`. This gem now publishes from `release.yml` in the `release` environment, so the entry reads `release.yml` / `release`.
 
 **2. Build/push without bundler**, so the dev-pinned lockfile can't trip frozen mode. Drop `bundler-cache: true` and replace `rubygems/release-gem` with explicit `gem build`/`gem push`:
 
@@ -76,8 +76,8 @@ Because the tag already pointed at the pre-fix commit, the release/tag had to be
 
 - For tag-driven publishing with an **ENV-injected version + committed `Gemfile.lock`**, build with `gem build`/`gem push` — not `bundle exec rake build` or `rubygems/release-gem`, which run frozen in CI.
 - When configuring trusted publishing, **read the workflow first**: the Environment field must be blank if there's no `environment:`, or the exact name if there is. A mismatch fails closed with "No trusted publisher configured."
-- Remember tag-triggered workflows run the workflow **at the tagged commit** — fix on `main`, then re-cut the tag; don't just re-run.
-- The publish path isn't covered by PR CI (gem-push is tags-only), so validate it on the **first real release** and treat that release as the test.
+- Remember tag-triggered workflows run the workflow **at the tagged commit**: a fix to the workflow itself must land on `main` and ship under the next tag. A release tag is never moved or deleted; delete the failed GitHub Release and publish the next draft instead.
+- The publish job runs only on a tag, so PR CI never exercises it: validate it on the **first real release** and treat that release as the test.
 
 ## Related Issues
 
