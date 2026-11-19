@@ -77,7 +77,7 @@ Tests that touch the UUID delete `tmp/chrome_devtools_uuid` in `setup` to start 
 
 ## Requirements
 
-Ruby ≥ 4.0, Rails ~> 8.0 (>= 8.0.2).
+Ruby ≥ 4.0.10, Rails ~> 8.0 (>= 8.0.2).
 
 ## CI standard
 
