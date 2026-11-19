@@ -47,7 +47,7 @@ Two independent fixes — one on RubyGems, one in the workflow.
       - name: Set up Ruby
         uses: ruby/setup-ruby@<sha> # v1
         with:
-          ruby-version: "4.0"
+          ruby-version: .ruby-version
           # NOTE: no bundler-cache — gem build/push don't need the bundle
 
       - name: Extract version from tag
